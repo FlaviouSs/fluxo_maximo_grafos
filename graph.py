@@ -6,13 +6,14 @@ class Graph:
         self.t = None
         self.vertices = set()
         self.arestas = []
+        self.residual = None
         
     def processar_entrada(self, path):
 
         with open(path, 'r') as f:
             lines = [line.strip() for line in f.readlines()]
 
-            self.numeroVerices = int(lines[0])
+            self.numeroVertices = int(lines[0])
             
             self.s = int(lines[1])
             self.t = int(lines[2])
@@ -32,4 +33,10 @@ class Graph:
 
             self.numeroVertices = len(self.vertices)
 
-    
+        matriz = [[0 for _ in range(self.numeroVertices)] for _ in range(self.numeroVertices)]
+        
+        for aresta in self.arestas:
+            matriz[aresta[0]][aresta[1]] = aresta[2]
+        
+        self.residual = matriz
+
