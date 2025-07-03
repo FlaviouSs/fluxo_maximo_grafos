@@ -40,3 +40,45 @@ class Graph:
         
         self.residual = matriz
 
+    def __dfs(self, s, t, visitado=None, caminho=None):
+        
+        if visitado is None:
+            visitado = [False] * self.numeroVertices
+        if caminho is None:
+            caminho = []
+
+        visitado[s] = True
+        caminho.append(s)
+
+        if s == t:
+            return caminho
+        
+        for index, valor in enumerate(self.residual[s]):
+            if not visitado[index] and valor > 0:
+                caminho_aumentante = self.__dfs(index, t, visitado, caminho.copy())
+                if caminho_aumentante:
+                    return caminho_aumentante
+                
+        return None
+    
+    def fordFulkerson(self, fonte, sumidouro):
+        fluxo_maximo = 0
+
+        caminho = self.__dfs(fonte, sumidouro)
+        while caminho:
+            caminho_fluxo = float("Inf")
+            
+            for i in range(len(caminho) - 1):
+                u, v = caminho[i], caminho[i + 1]
+                caminho_fluxo = min(caminho_fluxo, self.residual[u][v])
+
+            for i in range(len(caminho) - 1):
+                u, v = caminho[i], caminho[i + 1]
+                self.residual[u][v] -= caminho_fluxo
+                self.residual[v][u] += caminho_fluxo
+
+            fluxo_maximo += caminho_fluxo
+
+            caminho = self.__dfs(fonte, sumidouro)
+
+        return fluxo_maximo
