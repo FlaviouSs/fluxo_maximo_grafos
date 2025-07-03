@@ -61,6 +61,23 @@ class Graph:
                 
         return None
     
+    def __bfs(self, s, t, parent):
+        visitado = [False] * self.numeroVertices
+        fila = []
+        fila.append(s)
+        visitado[s] = True
+
+        while fila:
+            u = fila.pop(0)
+
+            for index, valor in enumerate(self.residual[u]):
+                if not visitado[index] and valor > 0:
+                    fila.append(index)
+                    visitado[index] = True
+                    parent[index] = u
+
+        return visitado[t]
+
     def fordFulkerson(self, fonte, sumidouro):
         fluxo_maximo = 0
 
@@ -80,5 +97,27 @@ class Graph:
             fluxo_maximo += caminho_fluxo
 
             caminho = self.__dfs(fonte, sumidouro)
+
+        return fluxo_maximo
+    
+    def edmonds_karp(self, fonte, sumidouro):
+        parent = [-1] * self.numeroVertices
+        fluxo_maximo = 0
+
+        while self.__bfs(fonte, sumidouro, parent):
+            caminho_fluxo = float("Inf")
+            s = sumidouro
+            while(s != fonte):
+                caminho_fluxo = min(caminho_fluxo, self.residual[parent[s]][s])
+                s = parent[s]
+
+            fluxo_maximo += caminho_fluxo
+            v = sumidouro
+
+            while(v != fonte):
+                u = parent[v]
+                self.residual[u][v] -= caminho_fluxo
+                self.residual[v][u] += caminho_fluxo
+                v = parent[v]
 
         return fluxo_maximo
